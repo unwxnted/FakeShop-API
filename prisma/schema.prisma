@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  jwt       String
+  name      String
+  password  String
+  admin     Boolean
+  orders    Order[]  // A user can have multiple orders
+}
+
+// This model represents a Product in the database
+model Product {
+  id      Int      @id @default(autoincrement())
+  name    String
+  stock   Int
+  orders  Order[]  // A product can be part of multiple orders
+}
+
+// This model represents an Order in the database
+model Order {
+  id          Int      @id @default(autoincrement())
+  date        DateTime
+  quantity    Int
+  userId      Int      // Foreign key reference to User table
+  user        User     @relation(fields: [userId], references: [id])
+  productId   Int      // Foreign key reference to Product table
+  product     Product  @relation(fields: [productId], references: [id])
+}
