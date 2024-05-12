@@ -15,6 +15,7 @@
     "bcrypt": "^5.1.1",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
-    "prisma": "^5.12.1"
+    "prisma": "^5.12.1",
+    "redis": "^4.6.13"
   }
 }

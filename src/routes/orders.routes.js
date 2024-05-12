@@ -1,10 +1,16 @@
 import { Router } from "express";
 import { PrismaClient } from "@prisma/client";
 import { isLogged, isAdmin } from "../helpers/utis.js";
+import { createClient } from "redis";
 
 const ordersRouter = new Router();
 const prisma = new PrismaClient();
 
+const redis = createClient();
+
+redis.on('error', err => console.log('Redis Client Error', err));
+
+await redis.connect();
 
 ordersRouter.get('/orders', isLogged, async (req, res) => {
 
@@ -16,14 +22,21 @@ ordersRouter.get('/orders', isLogged, async (req, res) => {
             }
         });
 
+        redis.get(`orders-${req.token}`, (err, reply) => {
+            if(reply) return res.json(JSON.parse(reply));
+        });
+
         const orders = await prisma.order.findMany({
             where: {
                 userId: user.id
             }
         });
 
+        redis.set(`orders-${req.token}`, JSON.stringify(orders));
+
         return res.json(orders);
-    } catch {
+    } catch (e){
+        console.log(e);
         return res.status(400).json({ 'Error': 'Bad request' });
     }
 
