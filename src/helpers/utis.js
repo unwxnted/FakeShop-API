@@ -1,9 +1,10 @@
 import bcrypt from 'bcrypt';
 import jsonwebtoken from 'jsonwebtoken';
-import { secret } from '../keys.js';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
+
+const {SECRET} = process.env;
 
 export const encryptPassword = async (password) => {
     const salt = await bcrypt.genSalt(10);
@@ -25,7 +26,7 @@ export const isLogged = async (req, res, next) => {
     const token = req.headers['authorization'];
     if(token === undefined) return res.status(400).json({'Error': 'Token Missing'});
     req.token = token;
-    jsonwebtoken.verify(req.token, secret, (err, data) => {
+    jsonwebtoken.verify(req.token, SECRET, (err, data) => {
         if(!err) return next();
         return res.status(403).json({'Error': 'Token not valid'});
     });
