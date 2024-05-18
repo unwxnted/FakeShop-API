@@ -34,7 +34,7 @@ export const isLogged = async (req, res, next) => {
 
 export const isAdmin = async (req, res, next) => {
     const token = req.token;
-    
+
     const user = await prisma.user.findFirst({
         where: {
             jwt : token
@@ -44,5 +44,25 @@ export const isAdmin = async (req, res, next) => {
     if(user && user.admin) return next();
     
     return res.status(403).json({'Error': 'Incorrect user privileges'});
+}
 
+export const createFirstAdmin = async (ADMIN_SECRET) => {
+    
+    if(await prisma.user.findFirst({
+        where: {
+            admin : true
+        }
+    })) return;
+
+    let firstAdmin = {
+        name: 'admin',
+        password : ADMIN_SECRET,
+        admin: true
+    };
+
+    firstAdmin.password = await encryptPassword(firstAdmin.password);
+    firstAdmin.jwt = await jsonwebtoken.sign({firstAdmin}, SECRET);
+    await prisma.user.create({
+        data : firstAdmin
+    });
 }

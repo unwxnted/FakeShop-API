@@ -2,6 +2,9 @@ import express from 'express'
 import productsRouter from './routes/products.routes.js';
 import usersRouter from './routes/users.routes.js';
 import ordersRouter from './routes/orders.routes.js';
+import { createFirstAdmin } from './helpers/utis.js';
+
+const {ADMIN_SECRET} = process.env;
 
 const app = express();
 
@@ -11,6 +14,7 @@ app.use('/api', productsRouter);
 app.use('/api', usersRouter);
 app.use('/api', ordersRouter);
 
-app.listen(3000, () => {
+app.listen(3000, async () => {
+    await createFirstAdmin(ADMIN_SECRET);
     console.log("server on port 3000");
 });

@@ -4,7 +4,7 @@ USE fakeshop;
 
 CREATE TABLE User (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  jwt VARCHAR(255),
+  jwt TEXT,
   name VARCHAR(255),
   password VARCHAR(255) NOT NULL,
   admin BOOLEAN

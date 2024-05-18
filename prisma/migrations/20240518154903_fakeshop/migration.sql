@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE `User` MODIFY `jwt` TEXT NULL,
+    MODIFY `name` VARCHAR(255) NULL,
+    MODIFY `password` VARCHAR(255) NOT NULL;

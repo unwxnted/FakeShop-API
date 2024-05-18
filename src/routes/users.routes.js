@@ -1,12 +1,12 @@
 import { Router } from "express";
 import jsonwebtoken from "jsonwebtoken";
-import { encryptPassword, matchPassword } from "../helpers/utis.js";
+import { encryptPassword, isAdmin, isLogged, matchPassword } from "../helpers/utis.js";
 import { PrismaClient } from '@prisma/client';
 
 const usersRouter = new Router();
 const prisma = new PrismaClient();
 
-const {SECRET, ADMIN_SECRET} = process.env;
+const {SECRET} = process.env;
 
 usersRouter.post('/users/signup', async (req, res) => {
 
@@ -14,14 +14,10 @@ usersRouter.post('/users/signup', async (req, res) => {
 
     if (name === undefined || password == undefined) return res.status(400).json({ 'Error': 'Missing Data' });
 
-    let admin = false;
-
-    if (req.body.admin && req.body.admin === ADMIN_SECRET) admin = true;
-
     let user = {
         name,
         password,
-        admin
+        admin : false
     };
 
     try {
@@ -45,6 +41,44 @@ usersRouter.post('/users/signup', async (req, res) => {
 
 });
 
+usersRouter.post('/users/promote/:id',isLogged, isAdmin ,async (req, res) => {
+    const {id} = req.params;
+    if (id === undefined) return res.status(400).json({ 'Error': 'Missing Data' });
+    try{
+        await prisma.user.update({
+            where: {
+                id: Number(id)
+            },
+            data: {
+                admin: true
+            }
+        });
+        return res.status(200).json({'Message' : `User ${id} promoted successfully`});
+    }catch (e){
+        console.log(e);
+        return res.status(400).json({ 'Error': 'invalid data in use' });
+    }
+});
+
+
+usersRouter.post('/users/demote/:id', isLogged, isAdmin, async (req, res) => {
+    const { id } = req.params;
+    if (id === undefined) return res.status(400).json({ 'Error': 'Missing Data' });
+    try{
+        await prisma.user.update({
+            where: {
+                id: Number(id)
+            },
+            data: {
+                admin: false
+            }
+        });
+        return res.status(200).json({'Message' : `User ${id} demoted successfully`});
+    }catch (e){
+        console.log(e);
+        return res.status(400).json({ 'Error': 'invalid data in use' });
+    }
+});
 
 usersRouter.get('/users/signin', async (req, res) => {
     const { name, password } = req.body;
@@ -63,5 +97,7 @@ usersRouter.get('/users/signin', async (req, res) => {
 
     return res.status(404).json({ 'Error': 'Auth error' });
 });
+
+
 
 export default usersRouter;
