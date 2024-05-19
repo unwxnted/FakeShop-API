@@ -20,17 +20,19 @@ model User {
   password String   @db.VarChar(255)
   admin     Boolean
   orders    Order[]  // A user can have multiple orders
+  carts Cart[]
 }
 
-// This model represents a Product in the database
+
 model Product {
   id      Int      @id @default(autoincrement())
   name    String
   stock   Int
   orders  Order[]  // A product can be part of multiple orders
+  carts Cart[]
 }
 
-// This model represents an Order in the database
+
 model Order {
   id          Int      @id @default(autoincrement())
   date        DateTime
@@ -39,4 +41,13 @@ model Order {
   user        User     @relation(fields: [userId], references: [id])
   productId   Int      // Foreign key reference to Product table
   product     Product  @relation(fields: [productId], references: [id])
+}
+
+model Cart {
+  id         Int       @id @default(autoincrement())
+  quantity   Int
+  userId     Int
+  productId  Int
+  user       User      @relation(fields: [userId], references: [id])
+  product    Product   @relation(fields: [productId], references: [id])
 }

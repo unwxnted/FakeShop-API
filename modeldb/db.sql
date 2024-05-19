@@ -13,8 +13,7 @@ CREATE TABLE User (
 CREATE TABLE Product (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255),
-  stock INT,
-  
+  stock INT
 );
 
 CREATE TABLE `Order` (
@@ -27,4 +26,13 @@ CREATE TABLE `Order` (
   CONSTRAINT FK_Product_User FOREIGN KEY (userId) REFERENCES User(id) ON DELETE CASCADE
   FOREIGN KEY (productId) REFERENCES Product(id),
   CONSTRAINT FK_Order_Product FOREIGN KEY (productId) REFERENCES Product(id) ON DELETE CASCADE
+);
+
+CREATE TABLE Cart (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  productId INT,
+  quantity INT,
+  userId INT,
+  FOREIGN KEY (userId) REFERENCES User(id),
+  CONSTRAINT FK_Cart_User FOREIGN KEY (userId) REFERENCES User(id) ON DELETE CASCADE
 );

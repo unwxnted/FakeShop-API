@@ -14,13 +14,13 @@ class ProductsController{
     async getAll(req, res){
         try {
     
-            redis.get('allProducts', (err, reply) => {
+            await redis.get('allProducts', (err, reply) => {
                 if(reply) return res.json(JSON.parse(reply));
             })
     
             const products = await prisma.product.findMany();
     
-            redis.set('allProducts', JSON.stringify(products));
+            await redis.set('allProducts', JSON.stringify(products));
     
             return res.json(products);
         } catch (error) {
@@ -51,7 +51,8 @@ class ProductsController{
                 data: req.body
             });
             return res.json(updatedProduct);
-        }catch{
+        }catch (e){
+            console.log(e);
             return res.status(400).json({'Error': 'Bad request'});
         }
     }

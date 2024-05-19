@@ -21,7 +21,7 @@ class OrdersController{
                 }
             });
     
-            redis.get(`orders-${req.token}`, (err, reply) => {
+            await redis.get(`orders-${req.token}`, (err, reply) => {
                 if(reply) return res.json(JSON.parse(reply));
             });
     
@@ -31,7 +31,7 @@ class OrdersController{
                 }
             });
     
-            redis.set(`orders-${req.token}`, JSON.stringify(orders));
+            await redis.set(`orders-${req.token}`, JSON.stringify(orders));
     
             return res.json(orders);
         } catch (e){
