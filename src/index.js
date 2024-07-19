@@ -4,11 +4,13 @@ import usersRouter from './routes/users.routes.js';
 import ordersRouter from './routes/orders.routes.js';
 import { createFirstAdmin } from './helpers/utis.js';
 import cartRouter from './routes/carts.routes.js';
+import cors from 'cors';
 
 const {ADMIN_SECRET} = process.env;
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 app.use('/api', productsRouter);

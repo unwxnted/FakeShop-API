@@ -28,6 +28,7 @@ model Product {
   id      Int      @id @default(autoincrement())
   name    String
   stock   Int
+  price   Float
   orders  Order[]  // A product can be part of multiple orders
   carts Cart[]
 }
