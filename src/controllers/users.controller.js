@@ -7,6 +7,36 @@ const prisma = new PrismaClient();
 const {SECRET} = process.env;
 
 class UsersController{
+
+    async data(req, res){
+        const user = await prisma.user.findFirst({
+            where: {
+                jwt: req.token
+            }
+        });
+        delete user.id;
+        delete user.password;
+        if(!user) return res.status(400).json({'Error': 'User not found'});
+        return res.json(user);
+    }
+
+    async search(req, res){
+        const { name } = req.params;
+        if (name === undefined) return res.status(400).json({ 'Error': 'Missing Data' });
+        try{
+            const user = await prisma.user.findMany({
+                where: {
+                    name
+                }
+            });
+            if (!user) return res.status(400).json({ 'Error': 'User not found' });
+            return res.json(user);
+        }catch (e){
+            console.log(e);
+            return res.status(400).json({ 'Error': 'invalid data in use' });
+        }
+    }
+
     
     async signup(req, res){
 

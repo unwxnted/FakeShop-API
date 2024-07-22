@@ -8,7 +8,7 @@ function Home() {
             <Header />
 
             <main className="flex-grow-1">
-                <section className="bg-light text-center d-flex justify-content-center align-items-center" style={{ minHeight: "calc(100vh - 10rem)" }}>
+                <section className="bg-light text-center d-flex justify-content-center align-items-center" style={{ width:"100%",minHeight: "calc(100vh - 7rem)" }}>
                     <div className="container w-50">
                         <h2 className="display-4">Welcome to Our Shopping Store</h2>
                         <p className="lead">Find the best products at the best prices!</p>

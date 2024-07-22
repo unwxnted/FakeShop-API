@@ -1,23 +1,64 @@
 import { useState, useEffect } from "react";
 import Header from "./Header.jsx";
 import Footer from "./Footer.jsx";
+import { getCookie } from "../../utils/cookies.jsx";
 
 function Products() {
-    const [pagination, setPagination] = useState(1);
     const [totalProducts, setTotalProducts] = useState(0);
     const [productsPerPage, setProductsPerPage] = useState(6);
     const [currentPage, setCurrentPage] = useState(1);
     const [products, setProducts] = useState([]);
+    const [selectedQuantities, setSelectedQuantities] = useState({});
 
     useEffect(() => {
-        fetch('https://fakestoreapi.com/products')
+
+        const token = getCookie('jwt');
+        if(!token){
+            window.location.href = '/signin';
+        }
+
+        fetch('http://localhost:3000/api/products', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'authorization': `${getCookie('jwt')}`
+            }
+        })
             .then(res => res.json())
             .then(data => {
+                console.log(data);
                 setProducts(data);
                 setTotalProducts(data.length);
             })
             .catch(err => console.log(err));
     }, []);
+
+    const handleQuantityChange = (event, productId) => {
+        const newSelectedQuantities = {...selectedQuantities};
+        newSelectedQuantities[productId] = event.target.value;
+        setSelectedQuantities(newSelectedQuantities);
+    }
+
+    const addToCart = (product) => {
+        const quantity = selectedQuantities[product.id] || 1;
+    
+        fetch('http://localhost:3000/api/carts/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'authorization': `${getCookie('jwt')}`
+            },
+            body: JSON.stringify({
+                productId: product.id,
+                quantity: parseInt(quantity)
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log(data);
+        })
+        .catch(err => console.log(err));
+    }
 
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -31,7 +72,7 @@ function Products() {
 
             <main className="flex-grow-1 d-flex justify-content-center align-items-center">
                 <section className="bg-light text-center" style={{
-                    width: "95%"
+                    width: "99.999%"
                 }}>
                     <div className="container">
                         <h2 className="display-3 m-3 border border-dark rounded-pill">Products</h2>
@@ -50,10 +91,11 @@ function Products() {
                                             maxHeight: '5em',
                                             overflow: 'hidden',
                                             textOverflow: 'ellipsis'
-                                        }}>{product.title}</h1>
+                                        }}>{product.name}</h1>
                                         <p className="card-text mb-1">{product.stock} in stock</p>
                                         <p className="card-text mb-1">${product.price}</p>
-                                        <button className="btn btn-primary">Add to Cart</button>
+                                        <input type="number" className="form-control" id="quantity" name="quantity" placeholder="Quantity" onChange={(e) => handleQuantityChange(e, product.id)} />
+                                        <button className="btn btn-primary" onClick={() => addToCart(product)}>Add to Cart</button>
                                     </div>
                                 </div>
                             ))}

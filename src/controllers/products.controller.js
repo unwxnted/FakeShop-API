@@ -11,6 +11,23 @@ await redis.connect();
 
 class ProductsController{
 
+    async search(req, res){
+        const { name } = req.params;
+        if (name === undefined) return res.status(400).json({ 'Error': 'Missing Data' });
+        try{
+            const product = await prisma.product.findMany({
+                where: {
+                    name
+                }
+            });
+            if (!product) return res.status(400).json({ 'Error': 'Product not found' });
+            return res.json(product);
+        }catch (e){
+            console.log(e);
+            return res.status(400).json({ 'Error': 'invalid data in use' });
+        }
+    }
+
     async getAll(req, res){
         try {
     
@@ -35,7 +52,8 @@ class ProductsController{
                 data: req.body
             });
             return res.json(newProduct);
-        } catch {
+        } catch (e){
+            console.log(e);
             return res.status(400).json({
                 'Error': 'Bad request'
             });
@@ -51,6 +69,20 @@ class ProductsController{
                 data: req.body
             });
             return res.json(updatedProduct);
+        }catch (e){
+            console.log(e);
+            return res.status(400).json({'Error': 'Bad request'});
+        }
+    }
+
+    async delete(req, res){
+        try{
+            const deletedProduct = await prisma.product.delete({
+                where: {
+                    id: parseInt(req.params.id)
+                }
+            });
+            return res.json(deletedProduct);
         }catch (e){
             console.log(e);
             return res.status(400).json({'Error': 'Bad request'});

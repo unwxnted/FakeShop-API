@@ -26,6 +26,9 @@ class CartsController {
             const response = await prisma.cart.findMany({
                 where: {
                     userId: user.id
+                },
+                include: {
+                    product: true
                 }
             });
 
@@ -59,6 +62,15 @@ class CartsController {
 
             if (product.stock < quantity) return res.status(400).json({ 'Error': 'Product not in stock' });
 
+            const cart = await prisma.cart.findFirst({
+                where: {
+                    userId: user.id,
+                    productId: productId
+                }
+            });
+            
+            if (cart && cart.quantity + quantity > product.stock) return res.status(400).json({ 'Error': 'Product not in stock' });
+
             await prisma.cart.create({
                 data: {
                     user: { connect: { id: user.id } },
@@ -67,7 +79,8 @@ class CartsController {
                 }
             });
             return res.status(200).json({'Message': 'Product added successfully'});
-        } catch{
+        } catch (e){
+            console.log(e);
             return res.status(400).json({ 'Error': 'Error adding product to cart' });
         }
 
@@ -121,6 +134,56 @@ class CartsController {
             return res.status(200).json({ 'Message': 'Cart paid successfully' });
         } catch {
             return res.status(500).json({ 'Error': 'Failed to process payment' });
+        }
+    }
+
+    async delete(req, res){
+        try{
+            const user = await prisma.user.findFirst({
+                where: {
+                    jwt: req.token
+                }
+            });
+
+            await prisma.cart.deleteMany({
+                where: {
+                    userId: user.id
+                }
+            });
+
+            return res.status(200).json({'Message': 'Cart deleted successfully'});
+        }catch{
+            return res.status(400).json({'Error': 'Bad request'});
+        }
+    }
+
+    async deleteProduct(req, res){
+        try{
+            const user = await prisma.user.findFirst({
+                where: {
+                    jwt: req.token
+                }
+            });
+
+            const cart = await prisma.cart.findFirst({
+                where: {
+                    userId: user.id,
+                    productId: parseInt(req.params.id)
+                }
+            });
+
+            if (!cart) return res.status(400).json({'Error': 'Product not found'});
+
+            await prisma.cart.delete({
+                where: {
+                    id: cart.id
+                }
+            });
+
+            return res.status(200).json({'Message': 'Product deleted successfully'});
+        }catch (e){
+            console.log(e);
+            return res.status(400).json({'Error': 'Bad request'});
         }
     }
 

@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { getCookie } from "../../utils/cookies.jsx";
-import { Link } from "react-router-dom";
 import Footer from "./Footer.jsx";
 import Header from "./Header.jsx";
+import { Link } from "react-router-dom";
 
-function Signup() {
+function Signin() {
 
     useEffect(() => {
         if(getCookie('jwt')) window.location.href = '/';
@@ -12,7 +12,7 @@ function Signup() {
 
     function handleSubmit(e){
         e.preventDefault();
-        fetch('http://localhost:3000/api/users/signup', {
+        fetch('http://localhost:3000/api/users/signin', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -41,7 +41,7 @@ function Signup() {
                     <div className="container h-100 d-flex justify-content-center align-items-center">
                         <div className="row justify-content-center w-100">
                             <div className="col-md-6 col-lg-4 border border-dark rounded p-4">
-                                <h2 className="display-4">Sign Up</h2>
+                                <h2 className="display-4">Sign In</h2>
                                 <p className="lead">Create an account to start shopping!</p>
                                 <form>
                                     <div className="form-group m-3">
@@ -52,9 +52,9 @@ function Signup() {
                                         <label htmlFor="password">Password</label>
                                         <input type="password" name="password" className="form-control" id="password" placeholder="Enter your password" />
                                     </div>
-                                    <button type="submit" className="btn btn-primary" onClick={handleSubmit}>Sign Up</button>
+                                    <button type="submit" className="btn btn-primary" onClick={handleSubmit}>Sign In</button>
                                 </form>
-                                <p className="pt-3">Already have an account? <Link to={"/signin"}>Sign In</Link></p>
+                                <p className="pt-3">Do not have an account? <Link to={"/signup"}>Sign Up</Link></p>
                             </div>
                         </div>
                     </div>
@@ -66,4 +66,4 @@ function Signup() {
     );
 }
 
-export default Signup;
+export default Signin;
